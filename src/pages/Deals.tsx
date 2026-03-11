@@ -1,19 +1,37 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { DealGrid } from "../components/features";
 import PageWithSidebar from "../components/layout/PageWithSidebar";
-import { getDealsByCategory } from "../utils/deals";
+import { dealsServices } from "../services/dealsServices";
 
 const Deals: React.FC = () => {
   const [searchParams] = useSearchParams();
   const category = searchParams.get("category") ?? "";
-  const deals = [...getDealsByCategory(category)].sort(
-    (a, b) => (b.isHotDeal ? 1 : 0) - (a.isHotDeal ? 1 : 0)
-  );
+  const [deals, setDeals] = useState<any[]>([]);
 
+  useEffect(
+    () => {
+      debugger
+      const fetchDeals = async () => {
+        console.log("entering to the useeffect");
+        try {
+          const data = await dealsServices.getAllDeals();
+          console.log("going ");
+          console.log("Fetched deals: ", data);
+          setDeals(data);
+        }
+        catch (error) {
+          console.error("Error fetching deals: ", error);
+        }
+      }
+      fetchDeals();
+
+    }
+    , []);
   const title = category
     ? `${category.charAt(0).toUpperCase() + category.slice(1)} Deals`
     : "All Deals";
+    
 
   return (
     <PageWithSidebar>

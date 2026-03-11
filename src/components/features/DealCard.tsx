@@ -40,8 +40,7 @@ const DealCard: React.FC<DealCardProps> = ({ deal, className = "" }) => {
     <article
       className={`bg-white rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden border border-gray-100 flex flex-col ${className}`}
     >
-      <Link
-        to={`/deals/${deal.id}`}
+      <Link to={`/deals/${deal.id}`}
         className="relative block w-full h-64 bg-gray-100 overflow-hidden"
       >
         <img

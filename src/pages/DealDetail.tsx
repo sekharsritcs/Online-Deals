@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getDealById } from "../utils/deals";
+import {  dealsServices } from "../services/dealsServices";
 import { formatCurrency } from "../utils";
 import { useFavorites } from "../context/FavoritesContext";
 import { getHotDealStyleForCategory } from "../constants/hotDealIcons";
+import { useEffect } from "react";
 import {
   FaFire,
   FaHeart,
@@ -26,8 +27,29 @@ const DealDetail: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"details" | "notes" | "poster">("details");
   const [vote, setVote] = useState<"like" | "dislike" | null>(null);
   const [comment, setComment] = useState("");
+  const [deal, setDeal] = useState<any>(null);
 
-  const deal = id ? getDealById(id) : undefined;
+ useEffect(() => {
+  const fetchDeal = async () => {
+    if (!id) return;
+
+    const numericId = Number(id);
+
+    if (Number.isNaN(numericId)) {
+      console.error("Invalid deal id:", id);
+      return;
+    }
+
+    try {
+      const data = await dealsServices.getDealById(numericId);
+      setDeal(data);
+    } catch (error) {
+      console.error("Error loading deal:", error);
+    }
+  };
+
+  fetchDeal();
+}, [id]);
 
   if (!deal) {
     return (
