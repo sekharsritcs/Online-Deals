@@ -24,10 +24,9 @@ export const dealsServices = {
   },
 
   async getDealById(id: number): Promise<any> {
-  const response = await Methods.get(`/deals/${id}`);
+    const response = await Methods.get(`/deals/${id}`);
 
-  console.log("API DEAL RESPONSE:", response);
-
-  return mapDeal(response.deal ?? response);
-}
+    console.log("API DEAL RESPONSE:", response);
+    return mapDeal(response.details);
+  }
 };
