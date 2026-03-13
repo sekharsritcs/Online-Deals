@@ -6,6 +6,7 @@ import {
   SAMPLE_SUB_CATEGORIES,
   SAMPLE_PRODUCTS,
 } from "../../../constants/adminSamples";
+import { adminServices } from "../../../services/adminServices";
 
 const emptySpec = { key: "", value: "" };
 
@@ -47,6 +48,13 @@ const AdminAddProduct: React.FC = () => {
   React.useEffect(() => {
     if (!id) return;
     const product = SAMPLE_PRODUCTS.find((p) => p.id === id);
+
+    const postDeals = async()=>{
+    try{
+
+      const response = await adminServices.addProduct(product);
+      console.log("API response for adding product:", response);    
+
     if (product) {
       setName(product.name);
       setBrand(product.brand);
@@ -66,6 +74,10 @@ const AdminAddProduct: React.FC = () => {
           : [emptySpec]
       );
     }
+  }   catch(error){
+      console.error("Error loading product data:", error);
+    }
+  }
   }, [id]);
 
   const subCategoriesForCategory = useMemo(() => {

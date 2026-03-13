@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import type { AdminProduct } from "../../../types/product";
+import { useEffect } from "react";
+import { dealsServices } from "../../../services/dealsServices";
 import {
   SAMPLE_PRODUCTS,
   SAMPLE_MAIN_CATEGORIES,
@@ -18,12 +20,47 @@ const LABELS: Record<AdminProductsProps["type"], string> = {
 };
 
 const AdminProductsAll: React.FC = () => {
-  const [products, setProducts] = useState<AdminProduct[]>(SAMPLE_PRODUCTS);
+  const [products, setProducts] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("");
   const [subCategoryFilter, setSubCategoryFilter] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
+
+  useEffect(
+    () => {
+
+      const fetchDeals = async () => {
+        console.log("entering to the useeffect");
+        try {
+          const deals = await dealsServices.getAllDeals();
+          console.log("Fetched deals:", deals);
+
+          const mappedProducts = deals.map((deal: any) => ({
+            id: deal.id,
+            name: deal.title,
+            brand: deal.merchant ?? "Unknown",
+            sku: `DEAL-${deal.id}`,
+            categoryName: deal.category ?? "Deals",
+            subCategoryName: "Hot Deals",
+            sellingPrice: deal.price ?? 0,
+            discountPercent: deal.discount ?? 0,
+            imageUrls: deal.imageUrl ? [deal.imageUrl] : [],
+            stock: 100,
+            status: deal.isHotDeal ? "active" : "draft"
+          }));
+
+          setProducts(mappedProducts);
+        }
+        catch (error) {
+          console.error("Error fetching deals: ", error);
+        }
+      }
+      fetchDeals();
+
+    }
+    , []);
+
 
   const subCategoriesByParent = useMemo(() => {
     const map: Record<string, typeof SAMPLE_SUB_CATEGORIES> = {};
@@ -68,18 +105,16 @@ const AdminProductsAll: React.FC = () => {
             <button
               type="button"
               onClick={() => setViewMode("grid")}
-              className={`rounded px-2 py-1 font-medium ${
-                viewMode === "grid" ? "bg-orange-600 text-white" : "text-slate-600 hover:bg-slate-50"
-              }`}
+              className={`rounded px-2 py-1 font-medium ${viewMode === "grid" ? "bg-orange-600 text-white" : "text-slate-600 hover:bg-slate-50"
+                }`}
             >
               Grid
             </button>
             <button
               type="button"
               onClick={() => setViewMode("table")}
-              className={`rounded px-2 py-1 font-medium ${
-                viewMode === "table" ? "bg-orange-600 text-white" : "text-slate-600 hover:bg-slate-50"
-              }`}
+              className={`rounded px-2 py-1 font-medium ${viewMode === "table" ? "bg-orange-600 text-white" : "text-slate-600 hover:bg-slate-50"
+                }`}
             >
               Table
             </button>
@@ -163,7 +198,9 @@ const AdminProductsAll: React.FC = () => {
             >
               <div className="aspect-square w-full bg-slate-100">
                 <img
-                  src={product.imageUrls[0] || "https://via.placeholder.com/300"}
+                  // src={product.
+                  //   image_url?.[0] || "https://via.placeholder.com/300"}
+                 // src={product.imageUrls?.[0] || "https://via.placeholder.com/300"}
                   alt={product.name}
                   className="h-full w-full object-cover"
                 />
@@ -180,7 +217,7 @@ const AdminProductsAll: React.FC = () => {
                 </p>
                 <div className="mt-2 flex items-center gap-2">
                   <span className="text-sm font-semibold text-slate-900">
-                    ₹{product.sellingPrice.toLocaleString("en-IN")}
+                    ₹{(product.sellingPrice ?? 0).toLocaleString("en-IN")}
                   </span>
                   {product.discountPercent > 0 && (
                     <span className="rounded bg-emerald-100 px-1.5 py-0.5 text-xs font-medium text-emerald-700">
@@ -190,9 +227,8 @@ const AdminProductsAll: React.FC = () => {
                 </div>
                 <div className="mt-2 flex items-center justify-between">
                   <span
-                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                      product.status === "active" ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-600"
-                    }`}
+                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${product.status === "active" ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-600"
+                      }`}
                   >
                     {product.status === "active" ? "Active" : "Draft"}
                   </span>
@@ -269,11 +305,10 @@ const AdminProductsAll: React.FC = () => {
                     <td className="px-4 py-2 align-top text-sm text-slate-700">{product.stock}</td>
                     <td className="px-4 py-2 align-top">
                       <span
-                        className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
-                          product.status === "active"
-                            ? "bg-emerald-50 text-emerald-700"
-                            : "bg-slate-100 text-slate-600"
-                        }`}
+                        className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${product.status === "active"
+                          ? "bg-emerald-50 text-emerald-700"
+                          : "bg-slate-100 text-slate-600"
+                          }`}
                       >
                         {product.status === "active" ? "Active" : "Draft"}
                       </span>

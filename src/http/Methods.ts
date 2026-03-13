@@ -58,8 +58,8 @@ export const api = {
         }
 
     },
-    delete: async (endpoint: string) => {
-        const response = await path.delete(endpoint);
+    delete: async (endpoint: string,params: any={}) => {
+        const response = await path.delete(endpoint, { params });
         if (response.status === 200 || response.data.success===true){
             console.log("Success:", response.data.data);
             return response.data.data;   
